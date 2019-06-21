@@ -50,8 +50,16 @@
         android:layout_height="wrap_content"
         android:hint="Club"/>
     <Button
+        android:id="@+id/btGuardar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="guardar"
         android:onClick="guardarJugador"/>
+    <Button
+        android:id="@+id/btActualizar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="actualizar"
+        android:visibility="gone"
+        android:onClick="actualizarJugador"/>
 </LinearLayout>

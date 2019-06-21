@@ -34,6 +34,10 @@ public class JugadorAdapter extends RecyclerView.Adapter<JugadorAdapter.JugadorH
         notifyDataSetChanged();
     }
 
+    public List<Jugador> getItems() {
+        return items;
+    }
+
     @NonNull
     @Override
     public JugadorHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -43,13 +47,19 @@ public class JugadorAdapter extends RecyclerView.Adapter<JugadorAdapter.JugadorH
     }
 
     @Override
-    public void onBindViewHolder(@NonNull JugadorHolder jugadorHolder, int i) {
+    public void onBindViewHolder(@NonNull JugadorHolder jugadorHolder, final int i) {
         Jugador currentJugador = items.get(i);
         jugadorHolder.setTvNombre(currentJugador.getNombre());
         jugadorHolder.setTvEdad(currentJugador.getEdad());
         jugadorHolder.setTvClub(currentJugador.getClub());
         jugadorHolder.setTvNacionalidad(currentJugador.getNacionalidad());
         jugadorHolder.setTvNacimiento(currentJugador.getNacimiento());
+        jugadorHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClick.onClick(v,i);
+            }
+        });
     }
 
     @Override
@@ -63,6 +73,7 @@ public class JugadorAdapter extends RecyclerView.Adapter<JugadorAdapter.JugadorH
         private TextView tvNacionalidad;
         private TextView tvClub;
         private TextView tvNacimiento;
+        private View viewJugador;
 
         public JugadorHolder(@NonNull View itemView) {
             super(itemView);

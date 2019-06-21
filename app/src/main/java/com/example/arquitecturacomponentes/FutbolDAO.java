@@ -1,5 +1,6 @@
 package com.example.arquitecturacomponentes;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -13,7 +14,7 @@ import java.util.List;
 public interface FutbolDAO {
 
     @Query("SELECT * FROM jugadores")
-    List<Jugador> getAllJugadores();
+    LiveData<List<Jugador>> getAllJugadores();
 
     @Insert
     void insertJugador(Jugador jugador);
@@ -23,5 +24,8 @@ public interface FutbolDAO {
 
     @Delete
     void deleteJugador(Jugador jugador);
+
+    @Query("SELECT * FROM jugadores WHERE id = :idJugador")
+    LiveData<Jugador> getJugadorById(int idJugador);
 
 }

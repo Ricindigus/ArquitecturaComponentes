@@ -1,6 +1,9 @@
 package com.example.arquitecturacomponentes;
 
 import android.app.DatePickerDialog;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -9,6 +12,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class JugadorActivity extends AppCompatActivity {
@@ -16,6 +21,7 @@ public class JugadorActivity extends AppCompatActivity {
     TextView tvFechaNacimiento;
     Date fechaNacimiento;
     FutbolDatabase db;
+    int idJugador;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +34,24 @@ public class JugadorActivity extends AppCompatActivity {
         etNacionalidad = findViewById(R.id.etNacionalidad);
         etNombre = findViewById(R.id.etNombre);
         db = FutbolDatabase.getInstance(this);
+        if (getIntent().getExtras() != null) getDataFromExtras();
+    }
+
+    private void getDataFromExtras() {
+        idJugador = getIntent().getExtras().getInt(MainActivity.ID_JUGADOR,-1);
+        if (idJugador != -1){
+            final LiveData<Jugador> mJugador = db.futbolDAO().getJugadorById(idJugador);
+            mJugador.observe(this, new Observer<Jugador>() {
+                @Override
+                public void onChanged(@Nullable Jugador jugador) {
+                    mJugador.removeObserver(this);
+                    displayData(jugador);
+
+                }
+            });
+            findViewById(R.id.btGuardar).setVisibility(View.GONE);
+            findViewById(R.id.btActualizar).setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -72,8 +96,31 @@ public class JugadorActivity extends AppCompatActivity {
                 etClub.getText().toString(),
                 fechaNacimiento
                 );
-
        db.futbolDAO().insertJugador(jugador);
        finish();
+    }
+
+    public void displayData(Jugador jugador){
+        etNombre.setText(jugador.getNombre());
+        etEdad.setText(String.valueOf(jugador.getEdad()));
+        etClub.setText(jugador.getClub());
+        etNacionalidad.setText(jugador.getNacionalidad());
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        fechaNacimiento = jugador.getNacimiento();
+        String strDate = dateFormat.format(fechaNacimiento);
+        tvFechaNacimiento.setText(strDate);
+    }
+
+    public void actualizarJugador(View view) {
+        Jugador jugador = new Jugador(
+                idJugador,
+                etNombre.getText().toString(),
+                Integer.parseInt(etEdad.getText().toString()),
+                etNacionalidad.getText().toString(),
+                etClub.getText().toString(),
+                fechaNacimiento
+        );
+        db.futbolDAO().updateJugador(jugador);
+        finish();
     }
 }
