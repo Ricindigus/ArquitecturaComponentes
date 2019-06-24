@@ -18,12 +18,10 @@ public abstract class FutbolDatabase extends RoomDatabase {
             synchronized (LOCK){
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
                         FutbolDatabase.class, NAME_DATABASE)
-                        .allowMainThreadQueries()
                         .build();
             }
         }
         return sInstance;
     }
     abstract public FutbolDAO futbolDAO();
-
 }

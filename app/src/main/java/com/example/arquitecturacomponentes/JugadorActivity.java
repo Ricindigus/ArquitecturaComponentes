@@ -17,11 +17,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class JugadorActivity extends AppCompatActivity {
-    EditText etNombre, etClub, etNacionalidad, etEdad;
-    TextView tvFechaNacimiento;
-    Date fechaNacimiento;
-    FutbolDatabase db;
-    int idJugador;
+    private EditText etNombre, etClub, etNacionalidad, etEdad;
+    private TextView tvFechaNacimiento;
+    private Date fechaNacimiento;
+    private FutbolDatabase db;
+    private int idJugador;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +44,7 @@ public class JugadorActivity extends AppCompatActivity {
             mJugador.observe(this, new Observer<Jugador>() {
                 @Override
                 public void onChanged(@Nullable Jugador jugador) {
-                    mJugador.removeObserver(this);
                     displayData(jugador);
-
                 }
             });
             findViewById(R.id.btGuardar).setVisibility(View.GONE);
@@ -89,15 +87,21 @@ public class JugadorActivity extends AppCompatActivity {
     }
 
     public void guardarJugador(View view) {
-        Jugador jugador = new Jugador(
+        final Jugador jugador = new Jugador(
                 etNombre.getText().toString(),
                 Integer.parseInt(etEdad.getText().toString()),
                 etNacionalidad.getText().toString(),
                 etClub.getText().toString(),
                 fechaNacimiento
                 );
-       db.futbolDAO().insertJugador(jugador);
-       finish();
+       AppExecutors.getInstance().getDiskIO()
+               .execute(new Runnable() {
+                   @Override
+                   public void run() {
+                       db.futbolDAO().insertJugador(jugador);
+                       finish();
+                   }
+               });
     }
 
     public void displayData(Jugador jugador){
@@ -112,7 +116,7 @@ public class JugadorActivity extends AppCompatActivity {
     }
 
     public void actualizarJugador(View view) {
-        Jugador jugador = new Jugador(
+        final Jugador jugador = new Jugador(
                 idJugador,
                 etNombre.getText().toString(),
                 Integer.parseInt(etEdad.getText().toString()),
@@ -120,7 +124,13 @@ public class JugadorActivity extends AppCompatActivity {
                 etClub.getText().toString(),
                 fechaNacimiento
         );
-        db.futbolDAO().updateJugador(jugador);
-        finish();
+        AppExecutors.getInstance().getDiskIO()
+                .execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        db.futbolDAO().updateJugador(jugador);
+                        finish();
+                    }
+                });
     }
 }
